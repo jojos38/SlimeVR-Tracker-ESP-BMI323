@@ -148,9 +148,9 @@ private:
     Quat lastFusedRotation = Quat(0, 0, 0, 0);
 
     // Time before autoshutdown enables (safety timer to prevent accidental early shutdown)
-    int32_t shutdownEnabledTime = 5 * 60 * 1000; // 1 minute (MILLIS)
+    int32_t shutdownEnabledTime = 5 * 60 * 1000 * 1000; // 1 minute (MICROS)
     // Time before tracker shutdowns if it doesn't move
-    const uint32_t timeBeforeAutoshutdown = 60 * 0.5 * 1000; // 5 minutes (MILLIS)
+    const uint32_t timeBeforeAutoshutdown = 60 * 5 * 1000 * 1000; // 5 minutes (MICROS)
     // Time between each gyroscope + accelerometer data send
 
     // Time between each fused rotation data send
@@ -159,12 +159,23 @@ private:
     const uint32_t tempSendInterval = 2000000; // 2Hz (MICROS)
     // Time between each magnetometer data fusion
     const uint32_t magFusionInterval = 40000; // 25Hz (MICROS)
+    // Time between each rest detection checking
+    const uint32_t restDetectInterval = 200000; // 5Hz (MICROS)
 
     uint32_t lastRotationSendTime = 0;
     uint32_t lastTempSendTime = 0;
     uint32_t lastMagFusionTime = 0;
     uint32_t lastMagSensorNanoTime = 0;
     uint32_t lastMagSensorSecTime = 0;
+    uint32_t lastRestDetectTime = 0;
+
+    /**
+     * Rest
+    */
+    uint8_t moveCounter = 0;
+    uint8_t consecutiveMoveCounter = 0;
+    bool lastRestValue = false;
+    uint32_t shutdownTimer = 0;
 
     /**
      * Sensors

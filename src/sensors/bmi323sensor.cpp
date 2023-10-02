@@ -334,6 +334,7 @@ void BMI323Sensor::motionLoop() {
     // Check if temperature needs to be sent (2 Hz)
     if (timeMicros - lastTempSendTime > tempSendInterval) {
         lastTempSendTime = timeMicros;
+
         float temperature;
         bmi323.getTemperatureCelcius(&temperature);
         networkConnection.sendTemperature(sensorId, temperature);
@@ -353,6 +354,54 @@ void BMI323Sensor::motionLoop() {
             // Serial.println("Mag: " + String(remappedAxes[0]) + ", " + String(remappedAxes[1]) + ", " + String(remappedAxes[2]));
         }
     #endif
+
+    // Rest detect for autostop
+    if (timeMicros - lastRestDetectTime > restDetectInterval) {
+        lastRestDetectTime = timeMicros;
+        
+        // Safety delay before autoshop is enabled
+        if (shutdownEnabledTime > 0) {
+            shutdownEnabledTime -= restDetectInterval;
+            if (shutdownEnabledTime <= 0) {
+                m_Logger.info("Autoshutdown enabled");
+            }
+        }
+
+        bool restDetected = m_sfusion.getRestDetected();
+        // If move detected
+        if (restDetected == false) {
+            if (lastRestValue != restDetected) {
+                moveCounter++;
+                // m_Logger.debug("Move detected");
+            }
+            // If short movements were detected for 3 times or more or 2 times in a row
+            if (moveCounter >= 2) {
+                shutdownTimer = 0;
+                moveCounter = 0;
+                // m_Logger.debug("Shutdown timer reset (counter)");
+            }
+
+            consecutiveMoveCounter++;
+            if (consecutiveMoveCounter >= 15) {
+                consecutiveMoveCounter = 0;
+                shutdownTimer = 0;
+                moveCounter = 0;
+                // m_Logger.debug("Shutdown timer reset (counter)");
+            }
+        } else {
+            if (shutdownTimer >= timeBeforeAutoshutdown && shutdownEnabledTime <= 0) {
+                // Pull up pin 13 to turn off the sensor
+                pinMode(13, OUTPUT);
+                digitalWrite(13, HIGH);
+            }
+
+            // Lower data rate to save power
+            consecutiveMoveCounter = 0;
+        }
+
+        shutdownTimer += restDetectInterval;
+        lastRestValue = restDetected;
+    }
 }
 
 void BMI323Sensor::applyMagCalibrationAndScale(float Mxyz[3]) {

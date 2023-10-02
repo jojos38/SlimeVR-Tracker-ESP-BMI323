@@ -26,9 +26,9 @@
 // ================================================
 
 // Set parameters of IMU and board used
-#define IMU IMU_BNO085
-#define SECOND_IMU IMU
-#define BOARD BOARD_SLIMEVR
+#define IMU IMU_BMI323
+#define SECOND_IMU IMU_BMI323
+#define BOARD BOARD_CUSTOM
 #define IMU_ROTATION DEG_270
 #define SECOND_IMU_ROTATION DEG_270
 
@@ -64,8 +64,8 @@ IMU_DESC_ENTRY(IMU_BMP160, PRIMARY_IMU_ADDRESS_ONE, IMU_ROTATION, PIN_IMU_SCL, P
 // The diagram looks like this:
 //   (Battery)--- [BATTERY_SHIELD_RESISTANCE] ---(INPUT_BOARD)---  [BATTERY_SHIELD_R2] ---(ESP32_INPUT)--- [BATTERY_SHIELD_R1] --- (GND)
 // #define BATTERY_SHIELD_RESISTANCE 180 //130k BatteryShield, 180k SlimeVR or fill in external resistor value in kOhm
-// #define BATTERY_SHIELD_R1 100 // Board voltage divider resistor Ain to GND in kOhm
-// #define BATTERY_SHIELD_R2 220 // Board voltage divider resistor Ain to INPUT_BOARD in kOhm
+// #define BATTERY_SHIELD_R1 36 // Board voltage divider resistor Ain to GND in kOhm
+// #define BATTERY_SHIELD_R2 10 // Board voltage divider resistor Ain to INPUT_BOARD in kOhm
 
 // LED configuration:
 // Configuration Priority 1 = Highest:
@@ -115,13 +115,13 @@ IMU_DESC_ENTRY(IMU_BMP160, PRIMARY_IMU_ADDRESS_ONE, IMU_ROTATION, PIN_IMU_SCL, P
     #define BATTERY_SHIELD_R2 40.2
   #endif
 #elif BOARD == BOARD_NODEMCU || BOARD == BOARD_WEMOSD1MINI
-  #define PIN_IMU_SDA D2
-  #define PIN_IMU_SCL D1
-  #define PIN_IMU_INT D5
-  #define PIN_IMU_INT_2 D6
+  #define PIN_IMU_SDA 4
+  #define PIN_IMU_SCL 5
+  #define PIN_IMU_INT 14
+  #define PIN_IMU_INT_2 12
   #define PIN_BATTERY_LEVEL A0
-//  #define LED_PIN 2
-//  #define LED_INVERTED true
+  #define LED_PIN 15
+  #define LED_INVERTED false
   #ifndef BATTERY_SHIELD_RESISTANCE
     #define BATTERY_SHIELD_RESISTANCE 180
   #endif
@@ -149,6 +149,24 @@ IMU_DESC_ENTRY(IMU_BMP160, PRIMARY_IMU_ADDRESS_ONE, IMU_ROTATION, PIN_IMU_SCL, P
 //  #define LED_INVERTED false
 #elif BOARD == BOARD_CUSTOM
   // Define pins by the examples above
+  #define PIN_IMU_SDA 4
+  #define PIN_IMU_SCL 5
+  #define PIN_IMU_INT 14
+  #define PIN_IMU_INT_2 12
+  #define PIN_BATTERY_LEVEL A0
+  #define LED_PIN 15
+  #define LED_INVERTED false
+  // The Wemos D1 mini has an internal voltage divider that I don't have on my custom board
+  // Therefor, BATTERY_SHIELD_RESISTANCE is set to 0 and SHIELD_R1 and R2 are adjusted instead
+  #ifndef BATTERY_SHIELD_RESISTANCE
+    #define BATTERY_SHIELD_RESISTANCE 0
+  #endif
+  #ifndef BATTERY_SHIELD_R1 
+    #define BATTERY_SHIELD_R1 36
+  #endif
+  #ifndef BATTERY_SHIELD_R2
+    #define BATTERY_SHIELD_R2 123.5
+  #endif
 #elif BOARD == BOARD_WROOM32
   #define PIN_IMU_SDA 21
   #define PIN_IMU_SCL 22
@@ -181,12 +199,4 @@ IMU_DESC_ENTRY(IMU_BMP160, PRIMARY_IMU_ADDRESS_ONE, IMU_ROTATION, PIN_IMU_SCL, P
   #define PIN_BATTERY_LEVEL 3
   #define LED_PIN LED_OFF  // RGB LED Protocol would need to be implementetet did not brother for the test, because the board ideal for tracker ifself
 //  #define LED_INVERTED false
-#elif BOARD == BOARD_WEMOSWROOM02
-  #define PIN_IMU_SDA 2
-  #define PIN_IMU_SCL 14
-  #define PIN_IMU_INT 0
-  #define PIN_IMU_INT_2 4
-  #define PIN_BATTERY_LEVEL A0
-  #define LED_PIN 16
-  #define LED_INVERTED true
 #endif
