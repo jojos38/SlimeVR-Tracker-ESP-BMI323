@@ -150,7 +150,7 @@ private:
     // Time before autoshutdown enables (safety timer to prevent accidental early shutdown)
     int32_t shutdownEnabledTime = 5 * 60 * 1000 * 1000; // 1 minute (MICROS)
     // Time before tracker shutdowns if it doesn't move
-    const uint32_t timeBeforeAutoshutdown = 60 * 5 * 1000 * 1000; // 5 minutes (MICROS)
+    const uint32_t timeBeforeAutoshutdown = 60 * 8 * 1000 * 1000; // 8 minutes (MICROS)
     // Time between each gyroscope + accelerometer data send
 
     // Time between each fused rotation data send
