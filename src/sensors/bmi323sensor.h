@@ -39,7 +39,7 @@ public:
     BMI323Sensor(uint8_t id, uint8_t address, float rotation, uint8_t sclPin, uint8_t sdaPin) :
         Sensor("BMI323Sensor", IMU_BMI323, id, address, rotation, sclPin, sdaPin),
         address(address),
-        m_sfusion(0.0025, 0.005, 0.04), // Gyro, Accel, Mag // in seconds (1 / frequency)
+        m_sfusion(0.005, 0.005, 0.04), // Gyro, Accel, Mag // in seconds (1 / frequency)
         bmi323(i2cRead, i2cWrite, delayUs, &this->address),
         bmm350(i2cRead, i2cWrite, delayUs, &this->bmm350Address)
         {};

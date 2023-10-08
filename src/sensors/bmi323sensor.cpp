@@ -176,7 +176,7 @@ void BMI323Sensor::motionSetup() {
 
     // Set gyroscope configuration
     result = bmi323.setGyroConfig(
-        BMI323::GYRO_ODR_400HZ,
+        BMI323::GYRO_ODR_200HZ,
         BMI323::GYRO_BANDWIDTH_ODR_HALF,
         BMI323::GYRO_MODE_NORMAL,
         BMI323::GYRO_RANGE_1000DPS,
@@ -351,7 +351,8 @@ void BMI323Sensor::motionLoop() {
             float remappedAxes[3] = { magData[1], magData[0], -magData[2] };
             m_sfusion.updateMag(remappedAxes, -1);
 
-            // Serial.println("Mag: " + String(remappedAxes[0]) + ", " + String(remappedAxes[1]) + ", " + String(remappedAxes[2]));
+            // bool magDisturbance = m_sfusion.getVqf()->getMagDistDetected();
+            // Serial.println("Mag disturbance: " + String(magDisturbance));
         }
     #endif
 
@@ -359,7 +360,7 @@ void BMI323Sensor::motionLoop() {
     if (timeMicros - lastRestDetectTime > restDetectInterval) {
         lastRestDetectTime = timeMicros;
         
-        // Safety delay before autoshop is enabled
+        // Safety delay before autostop is enabled
         if (shutdownEnabledTime > 0) {
             shutdownEnabledTime -= restDetectInterval;
             if (shutdownEnabledTime <= 0) {

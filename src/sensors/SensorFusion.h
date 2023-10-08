@@ -50,6 +50,22 @@ namespace SlimeVR
                 restMinT = 1.4f;
                 restThGyr = 6.0f; // 0.6f; // 400 norm
                 restThAcc = 0.8f; // 0.06f; // 100 norm
+
+                magDistRejectionEnabled = true;
+
+                // Not sure what this does
+                magRefTau = 10.0f;
+                // Increase mag dirusptance sensitivity
+                magNormTh = 0.07f;
+                // If the mag is disrupted for more than 2 minutes, reset mag reference point
+                magNewTime = 120.0f;
+                // On the first boot, set mag reference point after 5 seconds
+                magNewFirstTime = 5.0f;
+                // Minimum change rate so that magNewTime is being incremented (disabled at 0)
+                magNewMinGyr = 0.0f;
+                // magMaxRejectionTime doesn't seem to work so I set factor to an absurd value so that it's pretty much disabled
+                magMaxRejectionTime = 60.0f;
+                magRejectionFactor = 99999.0f;
             }
         };
         #endif
@@ -86,6 +102,7 @@ namespace SlimeVR
             sensor_real_t const * getLinearAcc();
             void getLinearAcc(sensor_real_t outLinAccel[3]);
             Vector3 getLinearAccVec();
+            VQF* getVqf();
 
             static void calcGravityVec(const sensor_real_t qwxyz[4], sensor_real_t gravVec[3]);
             static void calcLinearAcc(const sensor_real_t accin[3], const sensor_real_t gravVec[3], sensor_real_t accout[3]);

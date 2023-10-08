@@ -177,5 +177,11 @@ namespace SlimeVR
             accout[1] = accin[1] - gravVec[1] * CONST_EARTH_GRAVITY;
             accout[2] = accin[2] - gravVec[2] * CONST_EARTH_GRAVITY;
         }
+
+        VQF* SensorFusion::getVqf() {
+            #if SENSOR_USE_VQF
+                return &vqf;
+            #endif
+        }
     }
 }
