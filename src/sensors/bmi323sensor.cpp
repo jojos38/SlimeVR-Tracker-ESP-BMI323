@@ -138,6 +138,8 @@ void BMI323Sensor::printCalibrationData() {
 
 void BMI323Sensor::motionSetup() {
 
+    m_Logger.info("jojos38 BMI323 firmware V1.2");
+
     bool error = false;
     bool calibrate = false;
     int8_t result;
@@ -307,7 +309,7 @@ void BMI323Sensor::motionLoop() {
                 }
             }            
         } else {
-            m_Logger.error("FIFO data read failed");
+            // m_Logger.error("FIFO data read failed");
         }
     }
 
@@ -360,6 +362,9 @@ void BMI323Sensor::motionLoop() {
     if (timeMicros - lastRestDetectTime > restDetectInterval) {
         lastRestDetectTime = timeMicros;
         
+        // Check server connection
+        const bool isConnected = networkConnection.isConnected();
+
         // Safety delay before autostop is enabled
         if (shutdownEnabledTime > 0) {
             shutdownEnabledTime -= restDetectInterval;
@@ -400,7 +405,8 @@ void BMI323Sensor::motionLoop() {
             consecutiveMoveCounter = 0;
         }
 
-        shutdownTimer += restDetectInterval;
+        if (isConnected == false) shutdownTimer += restDetectInterval;
+        else shutdownTimer = 0;
         lastRestValue = restDetected;
     }
 }
