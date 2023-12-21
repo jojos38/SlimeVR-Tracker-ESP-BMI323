@@ -169,13 +169,17 @@ private:
     const uint32_t magFusionInterval = 40000; // 25Hz (MICROS)
     // Time between each rest detection checking
     const uint32_t restDetectInterval = 200000; // 5Hz (MICROS)
+    // Time between each autocalibration
+    const uint32_t autoCalibrationInterval = 900000000; // 15 Minutes (MICROS)
+    // Minimum time in seconds for the sensor to be resting before autocalibration starts
+    const uint8_t autoCalibrationRestSeconds = 5;
+    uint8_t autoCalibrationRestSecondsTimer = 0;
 
     uint32_t lastRotationSendTime = 0;
     uint32_t lastTempSendTime = 0;
     uint32_t lastMagFusionTime = 0;
-    uint32_t lastMagSensorNanoTime = 0;
-    uint32_t lastMagSensorSecTime = 0;
     uint32_t lastRestDetectTime = 0;
+    uint32_t lastAutomaticCalibration = 0;
 
     /**
      * Rest
