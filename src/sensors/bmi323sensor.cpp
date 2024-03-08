@@ -158,7 +158,7 @@ void BMI323Sensor::printCalibrationData() {
 
 void BMI323Sensor::motionSetup() {
 
-    m_Logger.info("jojos38 BMI323 firmware V1.2");
+    m_Logger.info("jojos38 BMI323 firmware V1.3");
 
     bool error = false;
     bool calibrate = false;
