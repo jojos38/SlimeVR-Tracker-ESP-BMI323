@@ -58,11 +58,25 @@ struct BMI323
     static const uint8_t GYRO_VALID = 0x02;    // Bit 1 represents gyroscope data validity
     static const uint8_t TEMP_VALID = 0x04;    // Bit 2 represents temperature data validity
 
+    // Autostop
+    // Time before autoshutdown enables (safety timer to prevent accidental early shutdown)
+    int32_t shutdownEnabledTime = 5 * 60 * 1000 * 1000; // 5 minute (MICROS)
+    // Time before tracker shutdowns if it doesn't move AND is not connected to the software
+    static constexpr uint32_t timeBeforeAutoshutdown = 60 * 3 * 1000 * 1000; // 3 minutes (MICROS)
+    // Time between each rest detection checking
+    static constexpr uint32_t restDetectInterval = 200000; // 5Hz (MICROS)
+    uint32_t lastRestDetectTime = 0;
+    uint8_t moveCounter = 0;
+    uint8_t consecutiveMoveCounter = 0;
+    bool lastRestValue = false;
+    uint32_t shutdownTimer = 0;
+
     // Intialization and variables
     I2CImpl i2c;
     SlimeVR::Logging::Logger &logger;
+    SensorFusionRestDetect &fusion;
     BMI323_LIB bmi323Lib;
-    BMI323(I2CImpl i2c, SlimeVR::Logging::Logger &logger): i2c(i2c), logger(logger), bmi323Lib(&i2cRead, &i2cWrite, &delayUs, &i2c) {}
+    BMI323(I2CImpl i2c, SlimeVR::Logging::Logger &logger, SensorFusionRestDetect &fusion): i2c(i2c), logger(logger), fusion(fusion), bmi323Lib(&i2cRead, &i2cWrite, &delayUs, &i2c) {}
 
     /**
      * Calibration data for the basic static calibration
@@ -356,6 +370,64 @@ struct BMI323
             } else {
                 logger.error("FIFO data read failed");
             }
+        }
+
+        checkAutoStop();
+    }
+
+    void checkAutoStop() {
+        uint32_t timeMicros = micros();
+        bool restDetected = fusion.getRestDetected();
+
+        // Rest detect for autostop
+        if (timeMicros - lastRestDetectTime > restDetectInterval) {
+            lastRestDetectTime = timeMicros;
+            
+            // Check server connection
+            const bool isConnected = networkConnection.isConnected();
+
+            // Safety delay before autostop is enabled
+            if (shutdownEnabledTime > 0) {
+                shutdownEnabledTime -= restDetectInterval;
+                if (shutdownEnabledTime <= 0) {
+                    logger.info("Autoshutdown enabled");
+                }
+            }
+
+            // If move detected
+            if (restDetected == false) {
+                if (lastRestValue != restDetected) {
+                    moveCounter++;
+                    // logger.debug("Move detected");
+                }
+                // If short movements were detected for 3 times or more or 2 times in a row
+                if (moveCounter >= 2) {
+                    shutdownTimer = 0;
+                    moveCounter = 0;
+                    // logger.debug("Shutdown timer reset (counter)");
+                }
+
+                consecutiveMoveCounter++;
+                if (consecutiveMoveCounter >= 15) {
+                    consecutiveMoveCounter = 0;
+                    shutdownTimer = 0;
+                    moveCounter = 0;
+                    // logger.debug("Shutdown timer reset (counter)");
+                }
+            } else {
+                if (shutdownTimer >= timeBeforeAutoshutdown && shutdownEnabledTime <= 0) {
+                    // Pull up pin 13 to turn off the sensor
+                    pinMode(13, OUTPUT);
+                    digitalWrite(13, HIGH);
+                }
+
+                // Lower data rate to save power
+                consecutiveMoveCounter = 0;
+            }
+
+            if (isConnected == false) shutdownTimer += restDetectInterval;
+            else shutdownTimer = 0;
+            lastRestValue = restDetected;
         }
     }
 
