@@ -50,11 +50,16 @@
 struct SensitivityOffsetXYZ { const char* mac; unsigned char sensorId; double spins; double x; double y; double z; };
 const SensitivityOffsetXYZ sensitivityOffsets[] = {
     // example values
-    { .mac = "A4:E5:7C:B6:00:01", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = 2.63, .y = 37.82, .z = 31.11 },
-    { .mac = "A4:E5:7C:B6:00:02", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = -2.38, .y = -26.8, .z = -42.78 },
-    { .mac = "A4:E5:7C:B6:00:03", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = 11, .y =  2.2, .z =  -1 },
-    { .mac = "A4:E5:7C:B6:00:04", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = -7, .y = -53.7, .z = -57 },
-    { .mac = "A4:E5:7C:B6:00:05", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = -10.63, .y = -8.25, .z = -18.6 },
+    { .mac = "80:64:6F:AE:0C:06", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = 46, .y = 26, .z = 38 }, // Left thigh
+    { .mac = "80:64:6F:B0:27:27", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = 14, .y = 17, .z = 4 }, // Right thigh
+    { .mac = "80:64:6F:AD:EF:A0", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = 36, .y = 29, .z = 30 }, // Right arm
+    { .mac = "80:64:6F:B0:24:98", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = -11, .y = -13, .z = -21 }, // Left arm
+    { .mac = "80:64:6F:AD:EE:77", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = 14, .y = 26, .z = 19 }, // Chest
+    { .mac = "80:64:6F:A7:1C:CF", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = 47, .y = 23, .z = 30 }, // Hip
+    { .mac = "80:64:6F:A7:17:E8", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = 0, .y = -5, .z = -19 }, // Right foot
+    { .mac = "80:64:6F:A7:17:E8", .sensorId = SENSORID_AUX, .spins = 10, .x = 16, .y = 15, .z = 7 }, // Right ankle
+    { .mac = "80:64:6F:AD:EE:F2", .sensorId = SENSORID_PRIMARY, .spins = 10, .x = -31, .y = -4, .z = -9 }, // Left foot
+    { .mac = "80:64:6F:AD:EE:F2", .sensorId = SENSORID_AUX, .spins = 10, .x = 46, .y = -13, .z = -2 }, // Left ankle
 };
 
 #endif

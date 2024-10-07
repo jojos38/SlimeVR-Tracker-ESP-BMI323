@@ -79,7 +79,7 @@ void WiFiNetwork::setUp() {
         #if USE_ATTENUATION
             WiFi.setOutputPower(20.0 -  ATTENUATION_N);
         #endif
-    WiFi.setPhyMode(WIFI_PHY_MODE_11N);
+    WiFi.setPhyMode(WIFI_PHY_MODE_11G);
     #endif
     WiFi.hostname("SlimeVR FBT Tracker");
     wifiHandlerLogger.info("Loaded credentials for SSID %s and pass length %d", WiFi.SSID().c_str(), WiFi.psk().length());
@@ -155,14 +155,14 @@ void WiFiNetwork::upkeep() {
                             #if USE_ATTENUATION
                                 WiFi.setOutputPower(20.0 -  ATTENUATION_G);
                             #endif
-                            WiFi.setPhyMode(WIFI_PHY_MODE_11G);
+                            WiFi.setPhyMode(WIFI_PHY_MODE_11N);
                             setStaticIPIfDefined();
                             WiFi.begin();
                             wifiConnectionTimeout = millis();
                             wifiHandlerLogger.error("Can't connect from saved credentials, status: %d.", WiFi.status());
-                            wifiHandlerLogger.debug("Trying saved credentials with PHY Mode G...");
+                            wifiHandlerLogger.debug("Trying saved credentials with PHY Mode N...");
                         } else {
-                            wifiHandlerLogger.debug("Skipping PHY Mode G attempt on 0-length SSID...");
+                            wifiHandlerLogger.debug("Skipping PHY Mode N attempt on 0-length SSID...");
                         }
                     #endif
                     wifiState = SLIME_WIFI_SAVED_G_ATTEMPT;
