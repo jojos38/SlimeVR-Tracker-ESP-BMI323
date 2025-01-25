@@ -196,7 +196,7 @@ public:
 	)
 		: Sensor(imu::Name, imu::Type, id, i2cAddress, rotation, sclPin, sdaPin)
 		, m_fusion(imu::GyrTs, imu::AccTs, imu::MagTs)
-		, m_sensor(I2CImpl(i2cAddress), m_Logger) {}
+		, m_sensor(I2CImpl(i2cAddress), m_Logger, m_fusion) {}
 	~SoftFusionSensor() {}
 
 	void motionLoop() override final {
