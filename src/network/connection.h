@@ -58,6 +58,7 @@ public:
 #endif
 	}
 
+	void setup();
 	void searchForServer();
 	void update();
 	void reset();

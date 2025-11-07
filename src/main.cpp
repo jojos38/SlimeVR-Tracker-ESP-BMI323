@@ -141,6 +141,7 @@ void setup() {
 	sensorManager.setup();
 
 	networkManager.setup();
+	networkConnection.setup(); // Initialize disconnect pin
 	OTA::otaSetup(otaPassword);
 	battery.Setup();
 
