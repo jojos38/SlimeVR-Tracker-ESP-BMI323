@@ -30,6 +30,8 @@
 #include "packets.h"
 
 #define TIMEOUT 3000UL
+#define SHUTDOWN_TIMEOUT 300000UL // 5 minutes in milliseconds
+#define SHUTDOWN_PIN 13 // GPIO pin to turn off the module
 
 template <typename T>
 uint8_t* convert_to_chars(T src, uint8_t* target) {
@@ -600,6 +602,12 @@ void Connection::searchForServer() {
 	}
 }
 
+void Connection::setup() {
+    // Initialize disconnect pin
+    pinMode(SHUTDOWN_PIN, OUTPUT);
+    digitalWrite(SHUTDOWN_PIN, LOW);  // Start with signal low
+}
+
 void Connection::reset() {
 	m_Connected = false;
 	std::fill(
@@ -619,6 +627,7 @@ void Connection::reset() {
 	);
 
 	m_UDP.begin(m_ServerPort);
+    digitalWrite(SHUTDOWN_PIN, LOW);  // Reset disconnect pin when resetting connection
 
 	statusManager.setStatus(SlimeVR::Status::SERVER_CONNECTING, true);
 }
@@ -626,6 +635,13 @@ void Connection::reset() {
 void Connection::update() {
 	if (!m_Connected) {
 		searchForServer();
+
+		// Check for connection timeout
+		if (millis() - m_LastPacketTimestamp > SHUTDOWN_TIMEOUT) {
+			m_Logger.warn("Disconnected for over 5 minutes, setting disconnect pin HIGH. Bye bye!");
+			digitalWrite(SHUTDOWN_PIN, HIGH);
+		}
+
 		return;
 	}
 
@@ -652,6 +668,13 @@ void Connection::update() {
 
 		return;
 	}
+
+    // Check for long disconnect
+    if (millis() - m_LastPacketTimestamp > SHUTDOWN_TIMEOUT) {
+        digitalWrite(SHUTDOWN_PIN, HIGH);  // Set pin high if disconnected for over 5 mins
+    } else {
+        digitalWrite(SHUTDOWN_PIN, LOW);   // Otherwise keep it low
+    }
 
 	int packetSize = m_UDP.parsePacket();
 	if (!packetSize) {
